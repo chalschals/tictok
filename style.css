@@ -1,0 +1,53 @@
+*,*:active,*:before,*:after {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+:root{
+    --cellwidth:100px;
+    --cellheight:100px;
+}
+body{
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+}
+
+.tictok{
+    width: calc(var(--cellwidth) * 3);
+    height:calc(var(--cellheight) * 3);;
+    background: rgb(194, 194, 194);
+    display: grid;
+    grid-template-columns: var(--cellwidth) auto minmax(var(--cellwidth), var(--cellwidth));
+    grid-template-rows: var(--cellheight) auto minmax(var(--cellheight), var(--cellheight));
+}
+.tictok.invalid{
+    animation: invalidAnimation 0.1s ease-in-out forwards;
+}
+@keyframes invalidAnimation {
+   0%,100%{
+    background:rgb(194, 194, 194);
+   }
+   50%{
+    background: rgb(218, 143, 143);
+   }
+}
+
+.each_cell{
+    border: 1px solid rgb(153, 153, 153);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans;
+    font-size: 3.5em;
+}
+.each_cell.x{
+    color: rgb(17, 129, 221);
+}
+.each_cell.o{
+    color: rgb(247, 133, 3);
+}
+.each_cell.won{
+    background:#a9eca9;
+}
