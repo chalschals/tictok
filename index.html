@@ -10,6 +10,19 @@
     <script src="./alertify.min.js"></script>
   </head>
   <body>
+    <div class="points-table">
+      <p>Player (0) &nbsp;Points &nbsp;&nbsp;: <span id="point-o">0</span></p>
+      <p>
+        Pilot&nbsp;&nbsp; (X) &nbsp;Points &nbsp;&nbsp;:
+        <span id="point-x">0</span>
+      </p>
+      <p>
+        Draw
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:
+        <span id="point-draw">0</span>
+      </p>
+      <button onclick="resetGame()">Restart Game</button>
+    </div>
     <div class="tictok">
       <span data-x="0" data-y="0" class="each_cell x0-y0"></span>
       <span data-x="0" data-y="1" class="each_cell x0-y1"></span>

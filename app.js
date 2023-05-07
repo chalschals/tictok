@@ -1,7 +1,16 @@
 const overallCells = document.querySelectorAll(".each_cell");
 const container = document.querySelector(".tictok");
+
+const playerScoreCard = document.querySelector("#point-o");
+const pilotScoreCard = document.querySelector("#point-x");
+const drawScoreCard = document.querySelector("#point-draw");
 const pilotPointer = "X";
 const playerPointer = "O";
+
+let pilotScore = 0;
+let playerScore = 0;
+let draw = 0;
+
 const board = [
   [null, null, null],
   [null, null, null],
@@ -20,7 +29,7 @@ for (cell of overallCells) {
     } else {
       const gemeOver = doMarking(clickedCell, playerPointer);
       if (!gemeOver) waitForPiolot();
-      else anounceWinner();
+      else anounceWinner(playerPointer);
     }
   });
 }
@@ -39,8 +48,18 @@ const shuffle = (array) => {
   return array;
 };
 
-const anounceWinner = () => {
-  alertify.success(`${playerPointer} Wont the match`, 2);
+const anounceWinner = (winner) => {
+  alertify.success(`${winner} Wont the match`, 2);
+  if (winner === pilotPointer) pilotScore++;
+  if (winner === playerPointer) playerScore++;
+  pilotScoreCard.innerHTML = pilotScore;
+  playerScoreCard.innerHTML = playerScore;
+};
+
+const anounceDraw = () => {
+  alertify.error(`Match Draw`, 2);
+  draw++;
+  drawScoreCard.innerHTML = draw;
 };
 
 const updateBoardArray = (x, y, pointer) => {
@@ -223,6 +242,12 @@ const predictNextStep = () => {
   let predictedCell = [];
 
   const [emptySlotCount, availableSlots] = doDiagnosisOnBoard();
+
+  if (availableSlots.length === 0) {
+    anounceDraw();
+    return;
+  }
+
   console.log("availableSlots", availableSlots);
   if (emptySlotCount >= 8) {
     //firstStep
@@ -234,97 +259,82 @@ const predictNextStep = () => {
         break;
       }
     }
-  } else if (emptySlotCount >= 6) {
-    const Cell2MatchOppo = check2CellMatch(playerPointer, pilotPointer);
-
-    if (Cell2MatchOppo.length > 0) {
-      console.log("NOSE CUT", Cell2MatchOppo);
+  } else {
+    const Cell2Match = check2CellMatch(pilotPointer, playerPointer);
+    if (Cell2Match.length > 0) {
+      //got winning strike
+      console.log("got winning strike");
       predicted = true;
-      for (cell of Cell2MatchOppo) {
+      for (cell of Cell2Match) {
         if (!board[cell[0]][cell[1]]) {
           predictedCell = [cell[0], cell[1]];
         }
       }
     } else {
-      console.log("INDIED ELSE");
-      for (avail of availableSlots) {
-        const [x, y] = getXY(avail);
-        board[x][y] = pilotPointer;
-        const Cell2MatchPilot = check2CellMatch(pilotPointer, playerPointer);
-        console.log("INDIED ELSE1", x, y, Cell2MatchPilot);
-        if (Cell2MatchPilot.length > 0) {
-          console.log("Preditcted", "true");
-          predicted = true;
-          board[x][y] = null;
-          if (!board[x][y]) {
-            predictedCell = [x, y];
-            console.log("DRAW1", [x, y]);
-          } else {
-            for (cell of Cell2MatchPilot) {
-              if (!board[cell[0]][cell[1]]) {
-                console.log("DRAW2", [cell[0], cell[1]]);
-                predictedCell = [cell[0], cell[1]];
-              }
-            }
-          }
-          break;
-        } else {
-          board[x][y] = null;
-        }
-      }
-    }
-  } else if (emptySlotCount >= 4 || emptySlotCount >= 2) {
-    const Cell2MatchOppo = check2CellMatch(playerPointer, pilotPointer);
+      const Cell2MatchOppo = check2CellMatch(playerPointer, pilotPointer);
 
-    if (Cell2MatchOppo.length > 0) {
-      console.log("NOSE CUT", Cell2MatchOppo);
-      predicted = true;
-      for (cell of Cell2MatchOppo) {
-        if (!board[cell[0]][cell[1]]) {
-          predictedCell = [cell[0], cell[1]];
+      if (Cell2MatchOppo.length > 0) {
+        console.log("NOSE CUT", Cell2MatchOppo);
+        predicted = true;
+        for (cell of Cell2MatchOppo) {
+          if (!board[cell[0]][cell[1]]) {
+            predictedCell = [cell[0], cell[1]];
+          }
         }
-      }
-    } else {
-      console.log("INDIED ELSE");
-      for (avail of availableSlots) {
-        const [x, y] = getXY(avail);
-        board[x][y] = pilotPointer;
-        const Cell2MatchPilot = check2CellMatch(pilotPointer, playerPointer);
-        console.log("INDIED ELSE1", x, y, Cell2MatchPilot);
-        if (Cell2MatchPilot.length > 0) {
-          console.log("Preditcted", "true");
-          predicted = true;
-          board[x][y] = null;
-          if (!board[x][y]) {
-            predictedCell = [x, y];
-            console.log("DRAW1", [x, y]);
-          } else {
-            for (cell of Cell2MatchPilot) {
-              if (!board[cell[0]][cell[1]]) {
-                console.log("DRAW2", [cell[0], cell[1]]);
-                predictedCell = [cell[0], cell[1]];
+      } else {
+        console.log("INDIED ELSE");
+        for (avail of availableSlots) {
+          const [x, y] = getXY(avail);
+          board[x][y] = pilotPointer;
+          const Cell2MatchPilot = check2CellMatch(pilotPointer, playerPointer);
+          console.log("INDIED ELSE1", x, y, Cell2MatchPilot);
+          if (Cell2MatchPilot.length > 0) {
+            console.log("Preditcted", "true");
+            predicted = true;
+            board[x][y] = null;
+            if (!board[x][y]) {
+              predictedCell = [x, y];
+              console.log("DRAW1", [x, y]);
+            } else {
+              for (cell of Cell2MatchPilot) {
+                if (!board[cell[0]][cell[1]]) {
+                  console.log("DRAW2", [cell[0], cell[1]]);
+                  predictedCell = [cell[0], cell[1]];
+                }
               }
             }
+            break;
+          } else {
+            board[x][y] = null;
           }
-          break;
-        } else {
-          board[x][y] = null;
+        }
+
+        if (!predicted) {
+          //Random Slot if cant predict
+          console.log("Random Slot if cant predict");
+          const randomSlot =
+            availableSlots[
+              Math.round(Math.random() * (availableSlots.length - 1) - 0)
+            ];
+          console.log(randomSlot);
+          predicted = true;
+          predictedCell = [randomSlot[0], randomSlot[1]];
         }
       }
     }
   }
 
   if (predicted) {
-    doMarking(
+    console.table(predictedCell);
+    const gameOver = doMarking(
       document.querySelector(`.x${predictedCell[0]}-y${predictedCell[1]}`),
       pilotPointer
     );
-    container.removeAttribute("data-pilot-turn");
+    if (!gameOver) container.removeAttribute("data-pilot-turn");
+    else anounceWinner(pilotPointer);
   } else {
     alertify.error(`unable to predict`, 2);
   }
-
-  // doMarking(overallCells[5], pilotPointer);
 };
 
 const waitForPiolot = () => {
@@ -337,6 +347,16 @@ const waitForPiolot = () => {
 const resetGame = () => {
   for (cell of overallCells) {
     cell.innerHTML = "";
+    cell.removeAttribute("data-already-clicked");
+    cell.classList.remove("won");
+    cell.classList.remove("o");
+    cell.classList.remove("x");
+    container.removeAttribute("data-pilot-turn");
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        board[i][j] = null;
+      }
+    }
   }
 };
 
